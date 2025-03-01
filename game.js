@@ -215,12 +215,14 @@ function gameLoop() {
 // 모바일 터치 컨트롤 추가
 let touchStartX = 0;
 gameArea.addEventListener('touchstart', function(e) {
+    if (!gameActive) return;
     touchStartX = e.touches[0].clientX;
+    e.preventDefault(); // 스크롤 방지
 });
 
 gameArea.addEventListener('touchmove', function(e) {
     if (!gameActive) return;
-    e.preventDefault();
+    e.preventDefault(); // 스크롤 방지
     
     const touchX = e.touches[0].clientX;
     const diff = touchX - touchStartX;
@@ -236,4 +238,46 @@ gameArea.addEventListener('touchmove', function(e) {
     
     player.style.left = playerX + 'px';
     touchStartX = touchX;
+});
+
+// 모바일 버튼 컨트롤 추가
+document.addEventListener('DOMContentLoaded', function() {
+    // 모바일 감지
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // 모바일 컨트롤 버튼 생성
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'mobile-controls';
+        controlsDiv.innerHTML = `
+            <button id="btn-left" class="control-btn">←</button>
+            <button id="btn-right" class="control-btn">→</button>
+        `;
+        
+        // 게임 영역 아래에 컨트롤 추가
+        const gameContainer = document.querySelector('.game-container');
+        gameContainer.appendChild(controlsDiv);
+        
+        // 버튼 이벤트 리스너
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+        
+        // 왼쪽 버튼 누르고 있을 때
+        btnLeft.addEventListener('touchstart', function() {
+            keys['ArrowLeft'] = true;
+        });
+        
+        btnLeft.addEventListener('touchend', function() {
+            keys['ArrowLeft'] = false;
+        });
+        
+        // 오른쪽 버튼 누르고 있을 때
+        btnRight.addEventListener('touchstart', function() {
+            keys['ArrowRight'] = true;
+        });
+        
+        btnRight.addEventListener('touchend', function() {
+            keys['ArrowRight'] = false;
+        });
+    }
 });
